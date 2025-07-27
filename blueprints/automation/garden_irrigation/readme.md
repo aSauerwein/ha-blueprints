@@ -7,4 +7,4 @@
 ## 🔥 FEATURES
 
 1. start irrigation based on a schedule
-2. start only if the precipation of today is above 2
+2. start only if the precipitation of today is above 2
