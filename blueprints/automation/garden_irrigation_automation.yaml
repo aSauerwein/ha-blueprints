@@ -1,5 +1,5 @@
 blueprint:
-  name: Garden irrigation Automation
+  name: Garden Irrigation Automation
   description: Start Garden Irrigation based on a schedule and weather conditions
   domain: automation
   input:
