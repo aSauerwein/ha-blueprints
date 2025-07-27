@@ -55,7 +55,7 @@ actions:
       - choose:
           - conditions:
               - condition: state
-                entity_id: schedule
+                entity_id: !input schedule
                 state: "on"
             sequence:
               - type: turn_on
@@ -63,7 +63,7 @@ actions:
                 domain: switch
           - conditions:
               - condition: state
-                entity_id: schedule
+                entity_id: !input schedule
                 state: "off"
             sequence:
               - type: turn_off
