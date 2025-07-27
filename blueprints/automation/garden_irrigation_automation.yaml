@@ -58,15 +58,15 @@ actions:
                 entity_id: !input schedule
                 state: "on"
             sequence:
-              - type: turn_on
-                entity_id: !input water_valve
-                domain: switch
+              - action: switch.turn_on
+                target:
+                  entity_id: !input water_valve
           - conditions:
               - condition: state
                 entity_id: !input schedule
                 state: "off"
             sequence:
-              - type: turn_off
-                entity_id: !input water_valve
-                domain: switch
+              - action: switch.turn_off
+                target:
+                  entity_id: !input water_valve
 mode: single
