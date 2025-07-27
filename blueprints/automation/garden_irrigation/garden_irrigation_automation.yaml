@@ -27,10 +27,20 @@ blueprint:
           filter:
             - domain:
               - switch
+    precipitation_ammount:
+      name: "Precipitation ammount"
+      description: "Select the amount of precipitation per day to start irrigation. If precipitation per day is below that value irrigation will start"
+      default: 5
+      selector:
+        number:
+          min: 0.0
+          max: 100.0
+          unit_of_measurement: "mm"
 
 variables:
   # Make input variables available as script level variables
   weather_sensor: !input weather_sensor
+  precipitation_ammount: !input precipitation_ammount
 
 triggers:
   - trigger: state
@@ -45,32 +55,28 @@ actions:
     target:
       entity_id: !input weather_sensor
     response_variable: weather_forecast
-  - if:
-      - condition: and
-        conditions:
-          - condition: template
-            value_template: "{{ weather_forecast is defined }}"
-          - condition: template
-            value_template: >-
-              {{
-              weather_forecast[weather_sensor].forecast[0].precipitation
-              | float > 0 }}
-    then:
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: !input schedule
-                state: "on"
-            sequence:
-              - action: switch.turn_on
-                target:
-                  entity_id: !input water_valve
-          - conditions:
-              - condition: state
-                entity_id: !input schedule
-                state: "off"
-            sequence:
-              - action: switch.turn_off
-                target:
-                  entity_id: !input water_valve
+  - choose:
+    - conditions:
+        - condition: state
+          entity_id: !input schedule
+          state: "on"
+        - condition: template
+          value_template: "{{ weather_forecast is defined }}"
+        - condition: template
+          value_template: >-
+            {{
+            weather_forecast[weather_sensor].forecast[0].precipitation
+            | float < precipitation_ammount }}
+      sequence:
+        - action: switch.turn_on
+          target:
+            entity_id: !input water_valve
+    - conditions:
+        - condition: state
+          entity_id: !input schedule
+          state: "off"
+      sequence:
+        - action: switch.turn_off
+          target:
+            entity_id: !input water_valve
 mode: single
