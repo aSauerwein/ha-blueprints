@@ -1,0 +1,72 @@
+blueprint:
+  name: Garden irrigation Automation
+  description: Start Garden Irrigation based on a schedule and weather conditions
+  domain: automation
+  input:
+    schedule:
+      name: "⏲️ Schedule"
+      description: Select a Schedule that defines when to start and stop irrigation
+      selector:
+        entity:
+          filter:
+            - domain:
+              - schedule
+    weather_sensor:
+      name: "☀️ Weather"
+      description: Select a Weather sensor
+      selector:
+        entity:
+          filter:
+            - domain:
+              - weather
+    water_valve:
+      name: "💧 Water Valve"
+      description: Select the switch that triggers start and stop of irrigation
+      selector:
+        entity:
+          filter:
+            - domain:
+              - switch
+
+triggers:
+  - trigger: state
+    entity_id:
+      - !input schedule
+conditions: []
+actions:
+  - action: weather.get_forecasts
+    metadata: {}
+    data:
+      type: daily
+    target:
+      entity_id: !input weather_sensor
+    response_variable: weather_forecast
+  - if:
+      - condition: and
+        conditions:
+          - condition: template
+            value_template: "{{ weather_forecast is defined }}"
+          - condition: template
+            value_template: >-
+              {{
+              weather_forecast[weather_sensor].forecast[0].precipitation
+              | float > 0 }}
+    then:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: schedule
+                state: "on"
+            sequence:
+              - type: turn_on
+                entity_id: !input water_valve
+                domain: switch
+          - conditions:
+              - condition: state
+                entity_id: schedule
+                state: "off"
+            sequence:
+              - type: turn_off
+                entity_id: !input water_valve
+                domain: switch
+mode: single
