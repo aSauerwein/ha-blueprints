@@ -28,8 +28,8 @@ blueprint:
             - domain:
               - switch
 
-trigger_variables:
-  # we need that trigger variable so that the selected entity id can also be used in template conditions
+variables:
+  # Make input variables available as script level variables
   weather_sensor: !input weather_sensor
 
 triggers:
